@@ -18,7 +18,7 @@ function insensitiveRegex(string) {
 
 // Strict string regex.
 function strictInsensitiveRegex(string) {
-  return new RegExp(`^${string}$`, 'i');
+  return new RegExp(`^${escapeRegex(string)}$`, 'i');
 }
 
 // Create an array of Regular Expressions from comma-separated string for $in MongoDB query.
@@ -33,11 +33,10 @@ function inRegex(string) {
 // getFilters(object, array) → Object
 // Get a map of data field name and its array of filter keys for $in.
 // { fieldName: { $in: [keyRegexOne, keyRegexTwo, ...nth_keyRegex] } }
-function getFiltersFromQuery(query, excluded) {
+function getFiltersFromQuery(query, includedFields) {
   let filters = {};
   for (const [key, value] of Object.entries(query)) {
-    // If it's not the excluded query fields, then create an $in query.
-    if (!excluded.includes(key)) filters[key] = { $in: inRegex(value) };
+    if (includedFields.includes(key)) filters[key] = { $in: inRegex(value) };
   }
   return filters;
 }
@@ -112,3 +111,5 @@ module.exports = {
 // Used:
 // - randomUppercase
 // - randomNum
+// - insensitiveRegex
+// - getFiltersFromQuery
